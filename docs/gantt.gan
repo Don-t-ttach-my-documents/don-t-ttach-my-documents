@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2022-10-03" view-index="0" gantt-divider-location="420" resource-divider-location="300" version="3.2.3247" locale="fr_FR">
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2022-11-14" view-index="0" gantt-divider-location="405" resource-divider-location="300" version="3.2.3230" locale="fr_FR">
     <description/>
     <view zooming-state="default:7" id="gantt-chart">
-        <field id="tpd3" name="Nom" width="371" order="0"/>
-        <field id="tpd4" name="Date de début" width="17" order="1"/>
-        <field id="tpd5" name="Date de fin" width="16" order="2"/>
+        <field id="tpd3" name="Nom" width="365" order="0"/>
+        <field id="tpd4" name="Date de début" width="20" order="1"/>
+        <field id="tpd5" name="Date de fin" width="19" order="2"/>
         <option id="filter.completedTasks" value="false"/>
         <option id="color.recent">
-            <![CDATA[#ffff99 #660000 #ffcccc #6666ff #99ff99 #cc66ff #f4f4f4]]>
+            <![CDATA[#ffff99 #99ff99 #660000 #ffcccc #6666ff #cc66ff #f4f4f4]]>
         </option>
     </view>
     <view id="resource-table">
@@ -197,7 +197,7 @@
             <task id="9" name="Lecture de documentation" color="#cc66ff" meeting="false" start="2022-10-14" duration="3" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true"/>
             <task id="10" name="Design" color="#cc66ff" meeting="false" start="2022-10-19" duration="3" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true"/>
         </task>
-        <task id="12" name="Développement: serveur de fichiers" color="#6666ff" meeting="false" start="2022-10-24" duration="24" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="false">
+        <task id="12" name="Développement: serveur de fichiers" color="#6666ff" meeting="false" start="2022-10-24" duration="24" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
             <task id="15" name="Installation de Minio" color="#6666ff" meeting="false" start="2022-10-24" duration="2" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true"/>
             <task id="16" name="Création d'un micro-service qui communique avec Minio pour enregistrer le fichier" color="#6666ff" meeting="false" start="2022-10-26" duration="2" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
                 <depend id="21" type="2" difference="0" hardness="Rubber"/>
@@ -206,7 +206,7 @@
             <task id="18" name="Unicité des fichiers" color="#6666ff" meeting="false" start="2022-11-24" duration="3" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true"/>
             <task id="31" name="Suppression des fichiers" color="#6666ff" meeting="false" start="2022-11-30" duration="3" complete="0" thirdDate="2022-11-07" thirdDate-constraint="0" expand="true"/>
         </task>
-        <task id="13" name="Développement: filtre du message SMTP" color="#99ff99" meeting="false" start="2022-10-25" duration="19" complete="0" thirdDate="2022-10-25" thirdDate-constraint="0" expand="false">
+        <task id="13" name="Développement: filtre du message SMTP" color="#99ff99" meeting="false" start="2022-10-25" duration="30" complete="0" thirdDate="2022-10-25" thirdDate-constraint="0" expand="true">
             <task id="20" name="Parsing du message SMTP" color="#99ff99" meeting="false" start="2022-10-25" duration="4" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true">
                 <depend id="21" type="2" difference="0" hardness="Rubber"/>
                 <depend id="22" type="2" difference="0" hardness="Rubber"/>
@@ -215,15 +215,19 @@
             <task id="22" name="Remplacement de la pièce jointe par l'url dans le fichier texte" color="#99ff99" meeting="false" start="2022-11-09" duration="2" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true"/>
             <task id="23" name="Connexion entre le parsing et le serveur SMTP" color="#99ff99" meeting="false" start="2022-11-14" duration="7" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true"/>
             <task id="24" name="Organisation en micro-services" color="#99ff99" meeting="false" start="2022-11-23" duration="4" complete="0" thirdDate="2022-10-03" thirdDate-constraint="0" expand="true"/>
+            <task id="38" name="Installation Postfix par tout le monde" color="#99ff99" meeting="true" start="2022-11-30" duration="0" complete="0" thirdDate="2022-10-10" thirdDate-constraint="0" expand="true"/>
+            <task id="37" name="Echeance premier proto Postfix + Milter" color="#99ff99" meeting="true" start="2022-12-14" duration="0" complete="0" thirdDate="2022-10-10" thirdDate-constraint="0" expand="true"/>
+            <task id="36" name="Clean du parsing (utilisation librairie?)" color="#99ff99" meeting="false" start="2022-12-12" duration="2" complete="0" thirdDate="2022-09-26" thirdDate-constraint="0" expand="true"/>
         </task>
-        <task id="14" name="Développement: Installation &amp; exécution du script avec postfix" color="#ffcccc" meeting="false" start="2022-11-14" duration="24" complete="0" thirdDate="2022-10-10" thirdDate-constraint="0" expand="false">
+        <task id="14" name="Développement: Installation &amp; exécution du script avec postfix" color="#ffcccc" meeting="false" start="2022-11-14" duration="24" complete="0" thirdDate="2022-10-10" thirdDate-constraint="0" expand="true">
             <task id="28" name="Documentation sur l'installation de postfix" color="#ffcccc" meeting="false" start="2022-11-14" duration="10" complete="0" thirdDate="2022-11-14" thirdDate-constraint="0" expand="true"/>
-            <task id="29" name="Installation avec Docker" color="#ffcccc" meeting="false" start="2022-11-28" duration="3" complete="0" thirdDate="2022-11-07" thirdDate-constraint="0" expand="true"/>
+            <task id="29" name="Installation avec Docker" color="#ffcccc" meeting="false" start="2022-11-28" duration="4" complete="0" thirdDate="2022-11-07" thirdDate-constraint="0" expand="true"/>
             <task id="30" name="Execution des scripts pour filtrage" color="#ffcccc" meeting="false" start="2022-12-05" duration="9" complete="0" thirdDate="2022-11-07" thirdDate-constraint="0" expand="true"/>
         </task>
-        <task id="33" name="Développement: Intégration des différentes parties" color="#ffff99" meeting="false" start="2022-12-16" duration="7" complete="0" thirdDate="2022-11-21" thirdDate-constraint="0" expand="false">
+        <task id="33" name="Développement: Intégration des différentes parties" color="#ffff99" meeting="false" start="2022-12-16" duration="8" complete="0" thirdDate="2022-11-21" thirdDate-constraint="0" expand="true">
             <task id="34" name="Intégration" color="#ffff99" meeting="false" start="2022-12-16" duration="4" complete="0" thirdDate="2022-11-21" thirdDate-constraint="0" expand="true"/>
             <task id="35" name="Corrections  si nécéssaires" color="#ffff99" meeting="false" start="2023-01-06" duration="3" complete="0" thirdDate="2022-11-21" thirdDate-constraint="0" expand="true"/>
+            <task id="39" name="Premier proto entièrement fonctionnel" color="#ffff99" meeting="true" start="2023-01-12" duration="0" complete="0" thirdDate="2022-11-14" thirdDate-constraint="0" expand="true"/>
         </task>
     </tasks>
     <resources/>
