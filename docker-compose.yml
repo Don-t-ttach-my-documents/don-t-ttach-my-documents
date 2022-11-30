@@ -9,4 +9,5 @@ services:
     extra_hosts:
       - ${DOMAIN}:127.0.0.1
     ports:
-      - "25"
+      - "25:25"
+      - "110:110"

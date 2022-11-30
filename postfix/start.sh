@@ -5,8 +5,9 @@ replace_env_in_file () {
   mv temp $1
 }
 
-replace_env_in_file etc/mailname
 replace_env_in_file etc/postfix/main.cf
+service rsyslog restart
 service apache2 restart
 service postfix restart
+service dovecot restart
 /bin/bash
