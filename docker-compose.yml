@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  postfix:
+    container_name: postfix
+    build: postfix/
+    hostname: ${DOMAIN}
+    dns: 127.0.0.1
+    tty: true
+    extra_hosts:
+      - ${DOMAIN}:127.0.0.1
