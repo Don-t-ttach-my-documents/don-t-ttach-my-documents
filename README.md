@@ -42,3 +42,5 @@ Méthode d'authentification: Mot de passe normal
 Nom d'utilisateur: user1_
 
 Faire de même avec user2@testimt.com
+
+Tester d'envoyer un mail de user1@testimt.com à user2@testimt.com avec Thunderbird, notamment avec une pièce jointe.
