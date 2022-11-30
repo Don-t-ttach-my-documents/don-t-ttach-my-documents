@@ -8,6 +8,8 @@ RUN apt-get install -y systemd apache2 nano mailutils gettext
 COPY main.cf /etc/postfix/main.cf
 COPY mailname /etc/mailname
 
+EXPOSE 25
+
 ADD start.sh /
 RUN chmod +x /start.sh
 ENTRYPOINT /start.sh
