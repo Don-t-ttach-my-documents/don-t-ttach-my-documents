@@ -10,7 +10,10 @@ RUN apt-get install -y -q  \
     apache2  \
     nano \
     telnet \
+    libmilter-dev \
     mailutils \
+    make \
+    gcc \
     gettext \
     dovecot-core \
     dovecot-imapd \
@@ -20,6 +23,7 @@ RUN apt-get install -y -q  \
 COPY main.cf /etc/postfix/main.cf
 COPY dovecot.conf /etc/dovecot/dovecot.conf
 COPY 10-auth.conf /etc/dovecot/conf.d/10-auth.conf
+COPY milter_filter /root/milter_filter
 EXPOSE 25 110
 
 RUN useradd -m user1
