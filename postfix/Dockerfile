@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND non_interactive
 
-RUN apt-get update
+RUN apt-get update --fix-missing
 RUN apt-get upgrade -y
 RUN apt-get install -y -q  \
     systemd  \
@@ -11,6 +11,7 @@ RUN apt-get install -y -q  \
     nano \
     telnet \
     libmilter-dev \
+    libcurl4-openssl-dev \
     mailutils \
     make \
     gcc \
@@ -30,6 +31,10 @@ RUN useradd -m user1
 RUN useradd -m user2
 RUN echo "user1:1234" | chpasswd
 RUN echo "user2:1234" | chpasswd
+
+WORKDIR /root/milter_filter
+RUN make
+WORKDIR /
 
 ADD start.sh /
 RUN chmod +x /start.sh
