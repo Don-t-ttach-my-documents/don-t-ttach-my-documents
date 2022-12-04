@@ -5,6 +5,9 @@ append_dot_mydomain = no
 
 readme_directory = no
 
+smtpd_milters = inet:localhost:8800
+milter_default_action = tempfail
+
 compatibility_level = 2
 
 smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
