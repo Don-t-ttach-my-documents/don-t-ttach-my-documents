@@ -44,3 +44,21 @@ Nom d'utilisateur: user1_
 Faire de même avec user2@testimt.com
 
 Tester d'envoyer un mail de user1@testimt.com à user2@testimt.com avec Thunderbird, notamment avec une pièce jointe.
+
+### Parsing et File storage (avec Minio)
+#### Avec docker
+```
+docker-compose build parsing
+docker-compose up parsing
+```
+
+#### Hors docker
+```
+python -m venv venv
+. /venv/Scripts/activate
+pip install -r parsing/requirements.txt
+pip install -r filestorageapi/requirements.txt
+```
+
+Puis lancer les scripts python à la main
+

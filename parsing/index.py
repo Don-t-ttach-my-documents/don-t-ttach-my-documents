@@ -10,6 +10,7 @@ HOST = "0.0.0.0"
 @app.route("/upload", methods=["POST"])
 def upload():
     message = request.get_data().decode("utf-8")
+    print(message)
     message_mime = get_mime_from_string(message)
     if not is_mime_message(message_mime):
         # Voir exemple postfix_message_raw.txt
@@ -23,7 +24,6 @@ def upload():
             res = message
     else:
         res = parse_mime_files(message)
-    print(res)
     return make_response(res, 200)
 
 

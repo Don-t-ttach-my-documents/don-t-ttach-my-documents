@@ -3,7 +3,7 @@ import sys
 import base64
 import requests
 
-URL_TO_FILE_SERVER = "http://file_storage_api:3200"
+URL_TO_FILE_SERVER = "http://filestorageapi:3200"
 
 
 def send_file_server(file_info, sender):
@@ -14,6 +14,7 @@ def send_file_server(file_info, sender):
     except requests.exceptions.ConnectionError as e:
         #####TO DEBUG#######
         # Supprimer ce code au déploiement
+        print("Can't connect to " + URL_TO_FILE_SERVER)
         print(e)
         file_info["filename"] = file_info["filename"].split(".")[0] + "_link.txt"
         file_info["content"] = base64.b64encode("url: failed to connect".encode('utf-8'))
