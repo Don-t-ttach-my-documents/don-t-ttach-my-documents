@@ -12,6 +12,7 @@ services:
       - "25:25"
       - "110:110"
   minio:
+    container_name: minio
     image: minio/minio
     ports:
       - "9000:9000"
@@ -23,12 +24,14 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server --console-address "0.0.0.0:9001" --address "0.0.0.0:9000" /data
   filestorageapi:
+    container_name: filestorageapi
     build: ./filestorageapi
     ports:
       - "3200:3200"
     depends_on:
       - minio
   parsing:
+    container_name: parsing
     build: ./parsing
     ports:
       - "3201:3201"
