@@ -28,6 +28,9 @@ services:
     build: ./filestorageapi
     ports:
       - "3200:3200"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     depends_on:
       - minio
   parsing:
