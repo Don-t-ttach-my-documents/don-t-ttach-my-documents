@@ -32,7 +32,7 @@ def build_url(email, filename):
 
 
 def get_file(email, filename, infos):
-    file_url = "https://" + MINIO_HOST + "/" + BUCKET_NAME + "/" + email + "/" + filename + "?" + infos["query"]
+    file_url = "http://" + MINIO_HOST + "/" + BUCKET_NAME + "/" + email + "/" + filename + "?" + infos["query"]
     return requests.get(file_url)
 
 
