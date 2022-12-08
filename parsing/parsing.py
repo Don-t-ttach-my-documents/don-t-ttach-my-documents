@@ -12,13 +12,8 @@ def send_file_server(file_info, sender):
     try:
         link = requests.post(URL_TO_FILE_SERVER + "/upload", data={"email": sender.strip()}, files=files)
     except requests.exceptions.ConnectionError as e:
-        #####TO DEBUG#######
-        # Supprimer ce code au déploiement
         print("Can't connect to " + URL_TO_FILE_SERVER)
         print(e)
-        file_info["filename"] = file_info["filename"].split(".")[0] + "_link.txt"
-        file_info["content"] = base64.b64encode("url: failed to connect".encode('utf-8'))
-        ###################
         return
     if link.status_code == 200:
         file_info["type"] = "application/txt"
@@ -26,8 +21,7 @@ def send_file_server(file_info, sender):
         file_info["content"] = str(
             base64.b64encode((URL_TO_FILE_SERVER + link.json()[0]).encode('utf-8')).decode('utf-8')) + "\n"
     else:
-        # print(link.json())
-        exit(-1)
+        return
 
 
 def parse_mime_files(mime_message):
@@ -83,4 +77,3 @@ if __name__ == "__main__":
         msg = file.read()
         file.close()
     msg = format_body_without_header(msg, "test2@mail.fr")
-    # print(deformat_headers(parse_mime_files(msg)))

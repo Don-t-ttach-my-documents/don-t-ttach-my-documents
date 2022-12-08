@@ -23,7 +23,6 @@ def upload():
             res = message
     else:
         res = parse_mime_files(message)
-    # print(res)
     return make_response(res, 200)
 
 
