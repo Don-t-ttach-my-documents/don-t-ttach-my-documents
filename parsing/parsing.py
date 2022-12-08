@@ -26,7 +26,7 @@ def send_file_server(file_info, sender):
         file_info["content"] = str(
             base64.b64encode((URL_TO_FILE_SERVER + link.json()[0]).encode('utf-8')).decode('utf-8')) + "\n"
     else:
-        print(link.json())
+        # print(link.json())
         exit(-1)
 
 
@@ -83,4 +83,4 @@ if __name__ == "__main__":
         msg = file.read()
         file.close()
     msg = format_body_without_header(msg, "test2@mail.fr")
-    print(deformat_headers(parse_mime_files(msg)))
+    # print(deformat_headers(parse_mime_files(msg)))

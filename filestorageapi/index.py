@@ -1,47 +1,9 @@
-import os
-import sys
-
 import jwt
-import requests
 
 from flask import Flask, request, make_response, jsonify, Response
-from minio import Minio
-from urllib.parse import urlparse
 
-if os.getenv("MINIO_ROOT_PASSWORD") is None or os.getenv("MINIO_ROOT_USER") is None:
-    sys.exit()
-
-BUCKET_NAME = "don-t-ttach-my-docs"
-SECRET = "secret"
-MINIO_HOST = "minio:9000"
-
-USER = os.getenv("MINIO_ROOT_USER")
-PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
-
-client = Minio(MINIO_HOST, access_key=USER, secret_key=PASSWORD, secure=False)
-
-
-def upload_to_minio(file, email):
-    check_bucket_exists()
-
-    size = os.fstat(file.fileno()).st_size
-    client.put_object(BUCKET_NAME, email + "/" + file.filename, file, size)
-    return build_url(email, file.filename)
-
-
-def build_url(email, filename):
-    url = client.presigned_get_object(BUCKET_NAME, email + "/" + filename)
-    query = str(urlparse(url).query)
-    token = jwt.encode({"query": query}, SECRET, algorithm="HS256")
-    res_url = "/file/" + filename + "?sender=" + email + "&token=" + token
-    return res_url
-
-
-def check_bucket_exists():
-    found = client.bucket_exists(BUCKET_NAME)
-    if not found:
-        client.make_bucket(BUCKET_NAME)
-
+from storage import upload_to_minio, get_file
+from variables import SECRET
 
 app = Flask(__name__)
 PORT = 3200
@@ -73,8 +35,7 @@ def get(file_name):
     except Exception as err:
         print(err)
         return make_response(jsonify({"error": "Wrong token"}), 400)
-    file_url = "https://" + MINIO_HOST + "/" + BUCKET_NAME + "/" + email + "/" + filename + "?" + infos["query"]
-    file = requests.get(file_url)
+    file = get_file(email, filename, infos)
     if file.status_code == 200:
         return Response(file.content, mimetype=file.headers.get("Content-Type"), status=200)
     else:
