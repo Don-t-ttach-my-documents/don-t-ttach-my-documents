@@ -10,7 +10,7 @@ replace_env_in_file etc/postfix/main.cf
 
 #Démarrage des services
 cd /root/milter_filter
-./sampleFilter -p inet:8800@localhost &
+./myFilter -p inet:8800@localhost &
 service rsyslog restart
 service apache2 restart
 service postfix restart

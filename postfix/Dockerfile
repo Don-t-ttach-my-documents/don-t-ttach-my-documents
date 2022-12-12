@@ -20,7 +20,8 @@ RUN apt-get install -y -q  \
     dovecot-imapd \
     dovecot-pop3d \
     mutt \
-    nmap
+    nmap \
+    iputils-ping
 COPY main.cf /etc/postfix/main.cf
 COPY dovecot.conf /etc/dovecot/dovecot.conf
 COPY 10-auth.conf /etc/dovecot/conf.d/10-auth.conf
