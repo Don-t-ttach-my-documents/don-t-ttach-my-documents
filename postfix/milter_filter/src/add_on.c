@@ -25,8 +25,10 @@ struct mlfiPriv
 	char	*mlfi_connectfrom;
 	char	*mlfi_helofrom;
 	FILE	*mlfi_fp;
+	unsigned char *body;
+	size_t	 bodyLen;
 	unsigned char *newBody;
-	int newBodyLength;
+	size_t   newBodyLength;
 };
 
 #define MLFIPRIV	((struct mlfiPriv *) smfi_getpriv(ctx))
@@ -238,11 +240,15 @@ mlfi_body(ctx, bodyp, bodylen)
 
 
 	/* continue processing */
-	// Get the new body
-	struct MemoryStruct res = sendBodyToParsing(bodyp, bodylen);
-	priv->newBody = res.memory;
-	//To insert new body length
-	priv->newBodyLength = strlen(priv->newBody);
+	if (priv->body==NULL) {
+		priv->body = malloc(bodylen*sizeof(unsigned char) +1);
+		strcpy(priv->body, bodyp);
+		priv->bodyLen = bodylen;
+	} else {
+		priv->bodyLen += bodylen;
+		priv->body = realloc(priv->body, priv->bodyLen*sizeof(unsigned char) +1);
+		strcat(priv->body, bodyp);
+	}
 
 	//------DEBUG only
 	// fprintf(stderr, "\n------------------------\n");
@@ -258,7 +264,13 @@ mlfi_eom(ctx)
 {
 	bool ok = TRUE;
 	struct mlfiPriv *priv = MLFIPRIV;
-	fprintf(stderr, "%s", priv->newBody);
+	
+	// Get the new body
+	struct MemoryStruct res = sendBodyToParsing(priv->body, priv->bodyLen);
+	priv->newBody = res.memory;
+	//To insert new body length
+	priv->newBodyLength = strlen(priv->newBody);
+	
 	if (smfi_replacebody(ctx, priv->newBody, priv->newBodyLength)==MI_FAILURE){
 		fprintf(stderr, "Replace body failed");
 		ok = FALSE;
@@ -327,6 +339,8 @@ mlfi_cleanup(ctx, ok)
 		free(priv->mlfi_fname);
 	if (priv->newBody != NULL)
 		free(priv->newBody);
+	if (priv->body!=NULL)
+		free(priv->body);
 	/* return status */
 	return rstat;
 }
