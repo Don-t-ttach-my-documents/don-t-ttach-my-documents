@@ -27,17 +27,11 @@ struct mlfiPriv
 	FILE	*mlfi_fp;
 	unsigned char *body;
 	size_t	 bodyLen;
-	unsigned char *newBody;
-	size_t   newBodyLength;
 };
 
 #define MLFIPRIV	((struct mlfiPriv *) smfi_getpriv(ctx))
 
 extern sfsistat		mlfi_cleanup(SMFICTX *, bool);
-
-/* recipients to add and reject (set with -a and -r options) */
-char *add = NULL;
-char *reject = NULL;
 
 sfsistat
 mlfi_connect(ctx, hostname, hostaddr)
@@ -59,8 +53,8 @@ mlfi_connect(ctx, hostname, hostaddr)
 	memset(priv, '\0', sizeof *priv);
 
 	/* save the private data */
+	priv->bodyLen =0;
 	smfi_setpriv(ctx, priv);
-	//priv->newBody = NULL;
 	ident = smfi_getsymval(ctx, "_");
 	if (ident == NULL)
 		ident = "???";
@@ -227,7 +221,9 @@ mlfi_body(ctx, bodyp, bodylen)
 	 size_t bodylen;
 {
         struct mlfiPriv *priv = MLFIPRIV;
-
+	//TODO si on a déjà stocké la PJ dans un filtre précédent, on passe
+	// Dans en-tête de la PJ -> délègue au parsing
+	
 	/* output body block to log file */
 	if (fwrite(bodyp, bodylen, 1, priv->mlfi_fp) != 1)
 	{
@@ -250,11 +246,6 @@ mlfi_body(ctx, bodyp, bodylen)
 		strcat(priv->body, bodyp);
 	}
 
-	//------DEBUG only
-	// fprintf(stderr, "\n------------------------\n");
-	// fprintf(stderr, "%s", bodyp);
-	// fprintf(stderr, "\n----------------------\n");
-	//----------------
 	return SMFIS_CONTINUE;
 }
 
@@ -267,17 +258,13 @@ mlfi_eom(ctx)
 	
 	// Get the new body
 	struct MemoryStruct res = sendBodyToParsing(priv->body, priv->bodyLen);
-	priv->newBody = res.memory;
-	//To insert new body length
-	priv->newBodyLength = strlen(priv->newBody);
-	
-	if (smfi_replacebody(ctx, priv->newBody, priv->newBodyLength)==MI_FAILURE){
+	if (smfi_replacebody(ctx, res.memory, strlen(res.memory))==MI_FAILURE){
 		fprintf(stderr, "Replace body failed");
 		ok = FALSE;
 	}
-	else 
-		fprintf(stderr, "Replace body succeed");
 
+	free(res.memory);
+	free(res);
 	//TODO add header
 
 	return mlfi_cleanup(ctx, ok);
@@ -337,10 +324,6 @@ mlfi_cleanup(ctx, ok)
 	/* release private memory */
 	if (priv->mlfi_fname != NULL)
 		free(priv->mlfi_fname);
-	if (priv->newBody != NULL)
-		free(priv->newBody);
-	if (priv->body!=NULL)
-		free(priv->body);
 	/* return status */
 	return rstat;
 }
@@ -357,6 +340,9 @@ mlfi_close(ctx)
 		free(priv->mlfi_connectfrom);
 	if (priv->mlfi_helofrom != NULL)
 		free(priv->mlfi_helofrom);
+	if (priv->body!=NULL)
+		free(priv->body);
+
 	free(priv);
 	smfi_setpriv(ctx, NULL);
 	return SMFIS_CONTINUE;
@@ -396,7 +382,7 @@ struct smfiDesc smfilter =
 {
 	"AttachmentServerFilter",	/* filter name */
 	SMFI_VERSION,	/* version code -- do not change */
-	SMFIF_ADDHDRS|SMFIF_ADDRCPT,
+	SMFIF_CHGBODY|SMFIF_ADDHDRS,
 			/* flags */
 	mlfi_connect,	/* connection info filter */
 	mlfi_helo,	/* SMTP HELO command filter */
@@ -418,7 +404,7 @@ usage(prog)
 	char *prog;
 {
 	fprintf(stderr,
-		"Usage: %s -p socket-addr [-t timeout] [-r reject-addr] [-a add-addr]\n",
+		"Usage: %s -p socket-addr [-t timeout]\n",
 		prog);
 }
 
@@ -479,29 +465,6 @@ main(argc, argv)
 					       "smfi_settimeout failed\n");
 				exit(EX_SOFTWARE);
 			}
-			break;
-
-		  case 'r':
-			if (optarg == NULL)
-			{
-				(void) fprintf(stderr,
-					       "Illegal reject rcpt: %s\n",
-					       optarg);
-				exit(EX_USAGE);
-			}
-			reject = optarg;
-			break;
-
-		  case 'a':
-			if (optarg == NULL)
-			{
-				(void) fprintf(stderr,
-					       "Illegal add rcpt: %s\n",
-					       optarg);
-				exit(EX_USAGE);
-			}
-			add = optarg;
-			smfilter.xxfi_flags |= SMFIF_ADDRCPT;
 			break;
 
 		  case 'h':

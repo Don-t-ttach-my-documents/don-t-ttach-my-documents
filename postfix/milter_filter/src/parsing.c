@@ -3,13 +3,6 @@
 #include <curl/curl.h>
 #include <string.h>
 
-//TO DEBUG
-static size_t write_data_in_file(void *ptr, size_t size, size_t nmemb, void *stream)
-{
-  size_t written = fprintf((FILE *)stream, ptr, size, nmemb);
-  return written;
-}
-
 static size_t receive_data(void *data, size_t size, size_t nmemb, void *userp)
 {
   size_t realsize = size * nmemb;
@@ -97,7 +90,6 @@ struct MemoryStruct sendBodyToParsing(char *body, size_t lenBody)
 
     /* we want to collect the result of the parsing */
     struct MemoryStruct chunk = {malloc(1), 0};
-    //FILE* inputFile = fopen("retour.txt", "w");
     /* send all data to this function  */
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, receive_data);
 
@@ -115,7 +107,6 @@ struct MemoryStruct sendBodyToParsing(char *body, size_t lenBody)
               curl_easy_strerror(res));
 
     /* always cleanup */
-    // fclose(inputFile);
     curl_easy_cleanup(curl);
     curl_global_cleanup();
     return chunk;
