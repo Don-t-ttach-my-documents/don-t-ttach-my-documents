@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#define PARSING_OK 0
+#define PARSING_ERROR 1
+
 struct ReceiveData
 {
   unsigned char *response;
@@ -22,12 +25,13 @@ struct WriteThis
   size_t sizeleft;
 };
 
+int initLibcurl();
+
 static size_t write_data_in_file(void *ptr, size_t size, size_t nmemb, void *stream);
 static size_t receive_data(void *data, size_t size, size_t nmemb, void *userp);
 static size_t send_data_callback(char *dest, size_t size, size_t nmemb, void *userp);
 
-
-struct MemoryStruct sendBodyToParsing(char* body, size_t lenBody);
+int sendBodyToParsing(char* body, size_t lenBody, struct MemoryStruct *parsed);
 
 
 #endif

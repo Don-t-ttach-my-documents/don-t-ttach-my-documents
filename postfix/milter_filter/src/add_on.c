@@ -194,6 +194,7 @@ mlfi_header(ctx, headerf, headerv)
 	}
 	
 	//TODO Vérifier le header si notre filtre a déjà fait son travail
+	// Header du mail ou header PJ ? (Préférence pour pièce jointe)
 
 	/* continue processing */
 	return SMFIS_CONTINUE;
@@ -234,16 +235,15 @@ mlfi_body(ctx, bodyp, bodylen)
 		return SMFIS_TEMPFAIL;
 	}
 
-
 	/* continue processing */
 	if (priv->body==NULL) {
-		priv->body = malloc(bodylen*sizeof(unsigned char) +1);
-		strcpy(priv->body, bodyp);
+		priv->body = malloc(bodylen);
+		memcpy(priv->body, bodyp, bodylen);
 		priv->bodyLen = bodylen;
 	} else {
+		priv->body = realloc(priv->body, priv->bodyLen + bodylen);
+		memcpy(priv->body+priv->bodyLen, bodyp, bodylen);
 		priv->bodyLen += bodylen;
-		priv->body = realloc(priv->body, priv->bodyLen*sizeof(unsigned char) +1);
-		strcat(priv->body, bodyp);
 	}
 
 	return SMFIS_CONTINUE;
@@ -256,15 +256,23 @@ mlfi_eom(ctx)
 	bool ok = TRUE;
 	struct mlfiPriv *priv = MLFIPRIV;
 	
+	struct MemoryStruct *parsed = malloc(sizeof(struct MemoryStruct));
+	parsed->memory = malloc(1);
+	parsed->size = 0;
 	// Get the new body
-	struct MemoryStruct res = sendBodyToParsing(priv->body, priv->bodyLen);
-	if (smfi_replacebody(ctx, res.memory, strlen(res.memory))==MI_FAILURE){
-		fprintf(stderr, "Replace body failed");
-		ok = FALSE;
+	if(sendBodyToParsing(priv->body, priv->bodyLen, parsed)==PARSING_OK){
+		fprintf(stderr, "Fini\n");
+		if (smfi_replacebody(ctx, parsed->memory, parsed->size)==MI_FAILURE){
+			fprintf(stderr, "Replace body failed");
+			ok = FALSE;
+		}
+	} else {
+		fprintf(stderr, "Erreur parsing\n");
 	}
 
-	free(res.memory);
-	free(res);
+	free(parsed->memory);
+	free(parsed);
+
 	//TODO add header
 
 	return mlfi_cleanup(ctx, ok);
@@ -415,7 +423,7 @@ main(argc, argv)
 {
 	bool setconn = FALSE;
 	int c;
-	const char *args = "p:t:r:a:h";
+	const char *args = "p:t:h";
 	extern char *optarg;
 
 	/* Process command line options */
@@ -486,5 +494,9 @@ main(argc, argv)
 		exit(EX_UNAVAILABLE);
 	}
 
+	if(initLibcurl()==1)
+		return -1;
+
+	fprintf(stderr, "\n----------Demarrage du filtre--------\n");
 	return smfi_main();
 }
