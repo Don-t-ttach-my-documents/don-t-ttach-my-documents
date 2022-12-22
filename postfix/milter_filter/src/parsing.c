@@ -3,11 +3,15 @@
 #include <curl/curl.h>
 #include <string.h>
 
-//TO DEBUG
-static size_t write_data_in_file(void *ptr, size_t size, size_t nmemb, void *stream)
-{
-  size_t written = fprintf((FILE *)stream, ptr, size, nmemb);
-  return written;
+int initLibcurl() {
+  CURLcode res = curl_global_init(CURL_GLOBAL_DEFAULT);
+  if (res != CURLE_OK){
+    fprintf(stderr, "curl_global_init() failed: %s\n",
+            curl_easy_strerror(res));
+    curl_global_cleanup();
+    return 1;
+  }
+  return 0;
 }
 
 static size_t receive_data(void *data, size_t size, size_t nmemb, void *userp)
@@ -52,28 +56,16 @@ static size_t send_data_callback(char *dest, size_t size, size_t nmemb, void *us
   return 0; /* no more data left to deliver */
 }
 
-struct MemoryStruct sendBodyToParsing(char *body, size_t lenBody)
+int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed)
 {
-  static const char *url = "http://parsing:3201/upload";
+  static const char url[27] = "http://parsing:3201/upload";
 
   CURL *curl;
   CURLcode res;
 
   struct WriteThis wt;
-
   wt.readptr = body;
   wt.sizeleft = lenBody;
-
-  /* In windows, this will init the winsock stuff */
-  res = curl_global_init(CURL_GLOBAL_DEFAULT);
-  /* Check for errors */
-  if (res != CURLE_OK)
-  {
-    fprintf(stderr, "curl_global_init() failed: %s\n",
-            curl_easy_strerror(res));
-    struct MemoryStruct retour = {"Error", 5};
-    return retour;
-  }
 
   /* get a curl handle */
   curl = curl_easy_init();
@@ -95,32 +87,26 @@ struct MemoryStruct sendBodyToParsing(char *body, size_t lenBody)
        consider CURLOPT_POSTFIELDSIZE_LARGE */
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)wt.sizeleft);
 
-    /* we want to collect the result of the parsing */
-    struct MemoryStruct chunk = {malloc(1), 0};
-    //FILE* inputFile = fopen("retour.txt", "w");
     /* send all data to this function  */
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, receive_data);
 
     /* we pass our 'chunk' struct to the callback function */
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)parsed);
 
     /* get verbose debug output please */
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
     /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
+
     /* Check for errors */
     if (res != CURLE_OK)
       fprintf(stderr, "curl_easy_perform() failed: %s\n",
               curl_easy_strerror(res));
 
     /* always cleanup */
-    // fclose(inputFile);
     curl_easy_cleanup(curl);
-    curl_global_cleanup();
-    return chunk;
+    return PARSING_OK;
   }
-  curl_global_cleanup();
-  struct MemoryStruct retour = {"erreur", 5};
-  return retour;
+  return PARSING_ERROR;
 }

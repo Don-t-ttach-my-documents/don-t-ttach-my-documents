@@ -7,8 +7,10 @@ URL_TO_FILE_SERVER = "http://filestorageapi:3200"
 
 
 def send_file_server(file_info, sender):
+
     data = base64.b64decode(file_info["content"])
-    files = {"file": (file_info["filename"], data, file_info["type"])}
+    #Replace sinon incapable de retrouver le fichier dans filestorage avec le lien obtenu
+    files = {"file": (file_info["filename"].replace("\n", "").replace("\r",""), data, file_info["type"])}
     try:
         link = requests.post(URL_TO_FILE_SERVER + "/upload", data={"email": sender.strip()}, files=files)
     except requests.exceptions.ConnectionError as e:
