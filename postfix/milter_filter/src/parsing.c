@@ -56,7 +56,7 @@ static size_t send_data_callback(char *dest, size_t size, size_t nmemb, void *us
   return 0; /* no more data left to deliver */
 }
 
-int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed)
+int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed, char* sender)
 {
   static const char url[27] = "http://parsing:3201/upload";
 
@@ -96,6 +96,14 @@ int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed)
     /* get verbose debug output please */
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
+    /* add mail of the sender in headers */
+    struct curl_slist *header = NULL;
+    char* initSender = malloc(strlen(sender)+ strlen("Sender: ") +2);
+    strcpy(initSender, "Sender: ");
+    header = curl_slist_append(header, strcat(initSender, sender));
+    
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+
     /* Perform the request, res will get the return code */
     res = curl_easy_perform(curl);
 
@@ -106,6 +114,8 @@ int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed)
 
     /* always cleanup */
     curl_easy_cleanup(curl);
+    curl_slist_free_all(header);
+    free(initSender);
     return PARSING_OK;
   }
   return PARSING_ERROR;

@@ -24,7 +24,7 @@ struct mlfiPriv
 	char	*mlfi_fname;
 	char	*mlfi_connectfrom;
 	char	*mlfi_helofrom;
-	FILE	*mlfi_fp;
+	FILE	*mlfi_fp; //Ecriture dans un fichier pour garder une trace
 	unsigned char *body;
 	size_t	 bodyLen;
 };
@@ -259,9 +259,9 @@ mlfi_eom(ctx)
 	struct MemoryStruct *parsed = malloc(sizeof(struct MemoryStruct));
 	parsed->memory = malloc(1);
 	parsed->size = 0;
+	char *mailaddr = smfi_getsymval(ctx, "{mail_addr}");
 	// Get the new body
-	if(sendBodyToParsing(priv->body, priv->bodyLen, parsed)==PARSING_OK){
-		fprintf(stderr, "Fini\n");
+	if(sendBodyToParsing(priv->body, priv->bodyLen, parsed, mailaddr)==PARSING_OK){
 		if (smfi_replacebody(ctx, parsed->memory, parsed->size)==MI_FAILURE){
 			fprintf(stderr, "Replace body failed");
 			ok = FALSE;

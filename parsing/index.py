@@ -16,7 +16,7 @@ def upload():
         if "This is a multi-part message in MIME format." in message:
             # TODO
             # Envoyer l'expéditeur à partir du filtre pour le recevoir ici
-            message = parse_mime_files(format_body_without_header(message, "test@imt.fr"))
+            message = parse_mime_files(format_body_without_header(message, request.headers.get("Sender")))
             res = deformat_headers(message)
         else:
             # Si le message n'est pas au format MIME, renvoyer le contenu
