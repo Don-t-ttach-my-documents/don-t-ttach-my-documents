@@ -3,6 +3,7 @@
 # File storage management, interfacing with Minio
 #
 #####
+from datetime import datetime
 
 import jwt
 import requests
@@ -19,8 +20,12 @@ def upload_to_minio(file, email):
     check_bucket_exists()
 
     size = os.fstat(file.fileno()).st_size
-    client.put_object(BUCKET_NAME, email + "/" + file.filename, file, size)
-    return build_url(email, file.filename)
+    timestamp = datetime.timestamp(datetime.now())
+    splitted_name = file.filename.split(".")
+    extension = splitted_name.pop()
+    filename = '.'.join(splitted_name) + "_" + str(timestamp) + "." + extension
+    client.put_object(BUCKET_NAME, email + "/" + filename, file, size)
+    return build_url(email, filename)
 
 
 def build_url(email, filename):
