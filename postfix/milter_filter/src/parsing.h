@@ -31,7 +31,7 @@ static size_t write_data_in_file(void *ptr, size_t size, size_t nmemb, void *str
 static size_t receive_data(void *data, size_t size, size_t nmemb, void *userp);
 static size_t send_data_callback(char *dest, size_t size, size_t nmemb, void *userp);
 
-int sendBodyToParsing(char* body, size_t lenBody, struct MemoryStruct *parsed);
+int sendBodyToParsing(char* body, size_t lenBody, struct MemoryStruct *parsed, char* sender);
 
 
 #endif
