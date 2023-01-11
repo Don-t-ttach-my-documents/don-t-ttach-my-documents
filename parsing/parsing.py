@@ -17,13 +17,17 @@ def send_file_server(file_info, sender):
         print("Can't connect to " + URL_TO_FILE_SERVER)
         print(e)
         return
+
     if link.status_code == 200:
         file_info["type"] = "application/txt"
-        file_info["filename"] = file_info["filename"].split(".")[0] + "_link.txt"
+        split = file_info["filename"].split(".")
+        split = split[:len(split)-1]
+        file_info["filename"] = ""
+        for s in split:
+            file_info["filename"] += s+"."
+        file_info["filename"] += "storage_link.txt"
         file_info["content"] = str(
             base64.b64encode((URL_TO_FILE_SERVER + link.json()[0]).encode('utf-8')).decode('utf-8')) + "\n"
-    else:
-        return
 
 
 def parse_mime_files(mime_message):
@@ -37,6 +41,8 @@ def parse_mime_files(mime_message):
             continue
 
         file_info = {"filename": part.get_filename(), "content": part.get_payload(), "type": part.get_content_type()}
+        if len(file_info["filename"]) >= 17 and ".storage_link.txt" == file_info["filename"][-17:]:
+            continue
 
         send_file_server(file_info, sender)
         part.replace_header('Content-disposition', "attachment; filename=\"" + file_info["filename"] + '"')
@@ -67,7 +73,7 @@ def format_body_without_header(message, sender):
 
 # enleve les headers ajoutés pour le parsing du message
 def deformat_headers(message):
-    return "\n".join(message.split("\n")[2:])
+    return "\n".join(message.split("\n")[3:])
 
 
 # Tester le parsing avec un fichier
@@ -78,4 +84,17 @@ if __name__ == "__main__":
     with open(sys.argv[1], 'r') as file:
         msg = file.read()
         file.close()
-    msg = format_body_without_header(msg, "test2@mail.fr")
+    message_mime = get_mime_from_string(msg)
+    if not is_mime_message(message_mime):
+        # Voir exemple postfix_message_raw.txt
+        if "This is a multi-part message in MIME format." in msg:
+            # TODO
+            # Envoyer l'expéditeur à partir du filtre pour le recevoir ici
+            message = parse_mime_files(format_body_without_header(msg, "test@imt.net"))
+            res = deformat_headers(message)
+        else:
+            # Si le message n'est pas au format MIME, renvoyer le contenu
+            res = msg
+    else:
+        res = parse_mime_files(msg)
+    print(res)
