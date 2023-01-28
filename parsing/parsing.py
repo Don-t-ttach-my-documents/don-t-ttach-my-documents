@@ -4,6 +4,7 @@ import base64
 import requests
 
 URL_TO_FILE_SERVER = "http://filestorageapi:3200"
+MIN_SIZE_FILE = 1000
 
 
 def send_file_server(file_info, sender):
@@ -41,7 +42,8 @@ def parse_mime_files(mime_message):
             continue
 
         file_info = {"filename": part.get_filename(), "content": part.get_payload(), "type": part.get_content_type()}
-        if len(file_info["filename"]) >= 17 and ".storage_link.txt" == file_info["filename"][-17:]:
+        #Approximation de 1 caractère = 1 octet
+        if len(file_info["content"]) <= MIN_SIZE_FILE:
             continue
 
         send_file_server(file_info, sender)
