@@ -40,6 +40,12 @@ services:
       - "3201:3201"
     depends_on:
       - filestorageapi
-
+  archive-cli:
+    container_name: archive-cli
+    build: ./archive-cli
+    profiles:
+      - do_not_up
+    depends_on:
+      - minio
 volumes:
   minio_storage: {}
