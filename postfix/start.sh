@@ -7,6 +7,10 @@ replace_env_in_file () {
 }
 
 replace_env_in_file etc/postfix/main.cf
+postmap /etc/postfix/sasl_passwd
+# cd /etc/ssl/certs
+# openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key-for-smtp-gmail.pem -out cert-for-smtp-gmail.pem
+# cat /etc/ssl/certs/cert-for-smtp-gmail.pem | sudo tee -a /etc/postfix/cacert.pem
 
 #Démarrage des services
 cd /root/milter_filter
