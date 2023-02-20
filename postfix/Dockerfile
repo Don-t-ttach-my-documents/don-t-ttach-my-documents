@@ -36,9 +36,6 @@ RUN useradd -m user2
 RUN echo "user1:1234" | chpasswd
 RUN echo "user2:1234" | chpasswd
 
-COPY sasl_passwd /etc/postfix/sasl_passwd
-RUN chmod 400 /etc/postfix/sasl_passwd
-
 WORKDIR /root/milter_filter
 RUN make
 WORKDIR /
