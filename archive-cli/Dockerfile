@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-# Install cron
+# Install curl
 RUN apt-get update
 RUN apt-get -y install curl
 # Install mc cli
