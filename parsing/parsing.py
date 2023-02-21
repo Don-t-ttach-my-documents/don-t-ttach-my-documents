@@ -2,9 +2,9 @@ import email
 import sys
 import base64
 import requests
+from variables import DOMAIN
 
 URL_TO_FILE_SERVER = "http://filestorageapi:3200"
-DOMAIN = "http://localhost:3200"
 MIN_SIZE_FILE = 1000
 
 
@@ -13,7 +13,6 @@ def send_file_server(file_info, sender):
     data = base64.b64decode(file_info["content"])
     #Replace sinon incapable de retrouver le fichier dans filestorage avec le lien obtenu
     files = {"file": (file_info["filename"].replace("\n", "").replace("\r",""), data, file_info["type"])}
-    print(file_info["filename"])
     try:
         link = requests.post(URL_TO_FILE_SERVER + "/upload", data={"email": sender.strip()}, files=files)
     except requests.exceptions.ConnectionError as e:
@@ -52,7 +51,6 @@ def parse_mime_files(mime_message):
         file_info = {"filename": part.get_filename(), "content": part.get_payload(), "type": part.get_content_type()}
         #Approximation de 1 caractère = 1 octet
         if len(file_info["content"]) <= MIN_SIZE_FILE:
-            print(file_info)
             continue
 
         send_file_server(file_info, sender)
