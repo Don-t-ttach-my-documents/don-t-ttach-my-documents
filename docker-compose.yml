@@ -44,6 +44,16 @@ services:
       - filestorageapi
     environment:
       DOMAIN: ${DOMAIN}
-
+  archive-cli:
+    container_name: archive-cli
+    build: ./archive-cli
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      DELAY: "5d"
+    profiles:
+      - do_not_up
+    depends_on:
+      - minio
 volumes:
   minio_storage: {}
