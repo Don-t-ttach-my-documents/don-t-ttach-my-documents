@@ -7,7 +7,6 @@ replace_env_in_file () {
 }
 
 replace_env_in_file etc/postfix/main.cf
-postmap /etc/postfix/sasl_passwd
 
 #Démarrage des services
 cd /root/milter_filter

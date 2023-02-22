@@ -8,8 +8,6 @@ RUN apt-get install -y -q  \
     systemd  \
     rsyslog  \
     apache2  \
-    nano \
-    telnet \
     libmilter-dev \
     libcurl4-openssl-dev \
     mailutils \
@@ -19,9 +17,6 @@ RUN apt-get install -y -q  \
     dovecot-core \
     dovecot-imapd \
     dovecot-pop3d \
-    mutt \
-    nmap \
-    iputils-ping \
     libsasl2-2 \
     ca-certificates \
     libsasl2-modules
