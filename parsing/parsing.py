@@ -9,7 +9,6 @@ MIN_SIZE_FILE = 1000
 
 
 def send_file_server(file_info, sender):
-
     data = base64.b64decode(file_info["content"])
     # Replace sinon incapable de retrouver le fichier dans filestorage avec le lien obtenu
     files = {"file": (file_info["filename"].replace("\n", "").replace("\r", ""), data, file_info["type"])}
@@ -26,15 +25,15 @@ def send_file_server(file_info, sender):
         split = split[:len(split) - 1]
         file_info["filename"] = ""
         for s in split:
-            file_info["filename"] += s+"."
+            file_info["filename"] += s + "."
         file_info["filename"] += "storage_link.html"
         file_info["content"] = str(
             base64.b64encode(
-            ("""<!doctype html>
+                ("""<!doctype html>
                 <script>
-                    window.location.replace('"""+ DOMAIN + link.json()[0]+"""')
+                    window.location.replace('""" + "http://" + DOMAIN + ":3200" + link.json()[0] + """')
                 </script>"""
-            ).encode('utf-8')
+                 ).encode('utf-8')
             ).decode('utf-8')) + "\n"
 
 
