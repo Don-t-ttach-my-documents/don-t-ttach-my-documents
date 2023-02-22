@@ -9,10 +9,9 @@ MIN_SIZE_FILE = 1000
 
 
 def send_file_server(file_info, sender):
-
     data = base64.b64decode(file_info["content"])
-    #Replace sinon incapable de retrouver le fichier dans filestorage avec le lien obtenu
-    files = {"file": (file_info["filename"].replace("\n", "").replace("\r",""), data, file_info["type"])}
+    # Replace sinon incapable de retrouver le fichier dans filestorage avec le lien obtenu
+    files = {"file": (file_info["filename"].replace("\n", "").replace("\r", ""), data, file_info["type"])}
     try:
         link = requests.post(URL_TO_FILE_SERVER + "/upload", data={"email": sender.strip()}, files=files)
     except requests.exceptions.ConnectionError as e:
@@ -23,18 +22,18 @@ def send_file_server(file_info, sender):
     if link.status_code == 200:
         file_info["type"] = "text/html"
         split = file_info["filename"].split(".")
-        split = split[:len(split)-1]
+        split = split[:len(split) - 1]
         file_info["filename"] = ""
         for s in split:
-            file_info["filename"] += s+"."
+            file_info["filename"] += s + "."
         file_info["filename"] += "storage_link.html"
         file_info["content"] = str(
             base64.b64encode(
-            ("""<!doctype html>
+                ("""<!doctype html>
                 <script>
-                    window.location.replace('"""+ DOMAIN + link.json()[0]+"""')
+                    window.location.replace('""" + "http://" + DOMAIN + ":3200" + link.json()[0] + """')
                 </script>"""
-            ).encode('utf-8')
+                 ).encode('utf-8')
             ).decode('utf-8')) + "\n"
 
 
@@ -49,7 +48,7 @@ def parse_mime_files(mime_message):
             continue
 
         file_info = {"filename": part.get_filename(), "content": part.get_payload(), "type": part.get_content_type()}
-        #Approximation de 1 caractère = 1 octet
+        # Approximation de 1 caractère = 1 octet
         if len(file_info["content"]) <= MIN_SIZE_FILE:
             continue
 

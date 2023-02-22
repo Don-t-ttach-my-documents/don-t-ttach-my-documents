@@ -4,13 +4,15 @@ services:
     container_name: postfix
     build: postfix/
     hostname: ${DOMAIN}
-    dns: 127.0.0.1
+    dns: 8.8.8.8
     tty: true
     extra_hosts:
-      - ${DOMAIN}:127.0.0.1
+      - ${DOMAIN}:0.0.0.0
     ports:
-      - "25:25"
+      - "587:25"
       - "110:110"
+    volumes:
+      - /etc/letsencrypt/archive/${DOMAIN}:/etc/letsencrypt/live/${DOMAIN}
   minio:
     container_name: minio
     image: minio/minio
@@ -40,6 +42,8 @@ services:
       - "3201:3201"
     depends_on:
       - filestorageapi
+    environment:
+      DOMAIN: ${DOMAIN}
   archive-cli:
     container_name: archive-cli
     build: ./archive-cli
