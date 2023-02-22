@@ -2,6 +2,7 @@ import email
 import sys
 import base64
 import requests
+from variables import DOMAIN
 
 URL_TO_FILE_SERVER = "http://filestorageapi:3200"
 MIN_SIZE_FILE = 1000
@@ -20,15 +21,21 @@ def send_file_server(file_info, sender):
         return
 
     if link.status_code == 200:
-        file_info["type"] = "application/txt"
+        file_info["type"] = "text/html"
         split = file_info["filename"].split(".")
         split = split[:len(split)-1]
         file_info["filename"] = ""
         for s in split:
             file_info["filename"] += s+"."
-        file_info["filename"] += "storage_link.txt"
+        file_info["filename"] += "storage_link.html"
         file_info["content"] = str(
-            base64.b64encode((URL_TO_FILE_SERVER + link.json()[0]).encode('utf-8')).decode('utf-8')) + "\n"
+            base64.b64encode(
+            ("""<!doctype html>
+                <script>
+                    window.location.replace('"""+ DOMAIN + link.json()[0]+"""')
+                </script>"""
+            ).encode('utf-8')
+            ).decode('utf-8')) + "\n"
 
 
 def parse_mime_files(mime_message):
