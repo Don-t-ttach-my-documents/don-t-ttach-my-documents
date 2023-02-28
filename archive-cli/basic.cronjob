@@ -1,2 +1,2 @@
-# To install on the host machine, change the path "/path/to/docker-compose" to the docker-compose.yml path
+# Pour installer sur la machine hôte, changer le chemin "/path/to/docker-compose" avec le chemin du docker-compose
 * * * * * docker-compose -f /path/to/docker-compose up archive-cli

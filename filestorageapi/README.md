@@ -1,5 +1,5 @@
-# Launch the service
-A minio server should be up to execute
+# Lancer le service
+Le serveur minio doit être lancé pour que le service fonctionne
 ```bash
 python -m venv venv/
 . ./venv/Scripts/activate
