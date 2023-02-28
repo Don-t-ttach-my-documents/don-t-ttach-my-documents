@@ -1,4 +1,8 @@
 ## Installation
+### Lancer tous les services
+```bash
+docker-compose up --build
+```
 ### Postfix
 #### Installation de Postfix
 Installation avec docker:
