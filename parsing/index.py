@@ -14,8 +14,6 @@ def upload():
     if not is_mime_message(message_mime):
         # Voir exemple postfix_message_raw.txt
         if "This is a multi-part message in MIME format." in message:
-            # TODO
-            # Envoyer l'expéditeur à partir du filtre pour le recevoir ici
             message = parse_mime_files(format_body_without_header(message, request.headers.get("Sender")))
             res = deformat_headers(message)
         else:

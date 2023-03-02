@@ -1,9 +1,17 @@
 # Parsing smtp message
-To test the programm, enter
+Pour tester le service, lancer
 ```bash
 python -m venv venv/
 . ./venv/Scripts/activate
 pip install -r requirements.txt
-python src/parsing.py test/exemple_smtp_attachment.txt
+python parsing.py test/smtp_test.txt
 ```
-with exemple_smtp_attachment.txt the smtp session
+avec *smtp_test.txt* le fichier contenant le message smtp
+
+# Lancer le service
+```bash
+python -m venv venv/
+. ./venv/Scripts/activate
+pip install -r requirements.txt
+python index.py
+```

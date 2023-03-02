@@ -24,7 +24,7 @@ struct mlfiPriv
 	char	*mlfi_fname;
 	char	*mlfi_connectfrom;
 	char	*mlfi_helofrom;
-	FILE	*mlfi_fp; //Ecriture dans un fichier pour garder une trace
+	FILE	*mlfi_fp; // Log in a file to keep a trace
 	unsigned char *body;
 	size_t	 bodyLen;
 };
@@ -43,16 +43,16 @@ mlfi_connect(ctx, hostname, hostaddr)
 	struct mlfiPriv *priv;
 	char *ident;
 
-	/* allocate some private memory */
+	/* alloue mémoire privéz */
 	priv = malloc(sizeof *priv);
 	if (priv == NULL)
 	{
-		/* can't accept this message right now */
+		/* refus temporaire du message */
 		return SMFIS_TEMPFAIL;
 	}
 	memset(priv, '\0', sizeof *priv);
 
-	/* save the private data */
+	/* sauvegarde données privées */
 	priv->bodyLen =0;
 	smfi_setpriv(ctx, priv);
 	ident = smfi_getsymval(ctx, "_");
@@ -110,7 +110,7 @@ mlfi_envfrom(ctx, argv)
 	struct mlfiPriv *priv = MLFIPRIV;
 	char *mailaddr = smfi_getsymval(ctx, "{mail_addr}");
 
-	/* open a file to store this message */
+	/* ouvre un fichier pour garder le message */
 	if ((priv->mlfi_fname = strdup("/tmp/msg.XXXXXX")) == NULL)
 	{
 		(void) mlfi_cleanup(ctx, FALSE);
@@ -130,18 +130,18 @@ mlfi_envfrom(ctx, argv)
 		return SMFIS_TEMPFAIL;
 	}
 
-	/* count the arguments */
+	/* compte les arguments */
 	while (*argv++ != NULL)
 		++argc;
 
-	/* log the connection information we stored earlier: */
+	/* log les informations de connexions stockées */
 	if (fprintf(priv->mlfi_fp, "Connect from %s (%s)\n\n",
 		    priv->mlfi_helofrom, priv->mlfi_connectfrom) == EOF)
 	{
 		(void) mlfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	/* log the sender */
+	/* log l'expéditeur */
 	if (fprintf(priv->mlfi_fp, "FROM %s (%d argument%s)\n",
 		    mailaddr ? mailaddr : "???", argc,
 		    (argc == 1) ? "" : "s") == EOF)
@@ -164,7 +164,7 @@ mlfi_envrcpt(ctx, argv)
 	char *rcptaddr = smfi_getsymval(ctx, "{rcpt_addr}");
 	int argc = 0;
 
-	/* count the arguments */
+	/* compte les arguments */
 	while (*argv++ != NULL)
 		++argc;
 
@@ -186,15 +186,12 @@ mlfi_header(ctx, headerf, headerv)
 	 char *headerf;
 	 unsigned char *headerv;
 {
-	/* write the header to the log file */
+	/* écrit les headers dans le log */
 	if (fprintf(MLFIPRIV->mlfi_fp, "%s: %s\n", headerf, headerv) == EOF)
 	{
 		(void) mlfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	
-	//TODO Vérifier le header si notre filtre a déjà fait son travail
-	// Header du mail ou header PJ ? (Préférence pour pièce jointe)
 
 	/* continue processing */
 	return SMFIS_CONTINUE;
@@ -204,7 +201,7 @@ sfsistat
 mlfi_eoh(ctx)
 	 SMFICTX *ctx;
 {
-	/* output the blank line between the header and the body */
+	/* Retour à la ligne avant la fin de fichier */
 	if (fprintf(MLFIPRIV->mlfi_fp, "\n") == EOF)
 	{
 		(void) mlfi_cleanup(ctx, FALSE);
@@ -222,20 +219,18 @@ mlfi_body(ctx, bodyp, bodylen)
 	 size_t bodylen;
 {
         struct mlfiPriv *priv = MLFIPRIV;
-	//TODO si on a déjà stocké la PJ dans un filtre précédent, on passe
-	// Dans en-tête de la PJ -> délègue au parsing
 	
-	/* output body block to log file */
+	/* log le corps du mail */
 	if (fwrite(bodyp, bodylen, 1, priv->mlfi_fp) != 1)
 	{
-		/* write failed */
+		/* échec du log */
 		fprintf(stderr, "Couldn't write file %s: %s\n",
 			priv->mlfi_fname, strerror(errno));
 		(void) mlfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 
-	/* continue processing */
+	/* Stocke le mail dans une variable pour l'envoyer au parser */
 	if (priv->body==NULL) {
 		priv->body = malloc(bodylen);
 		memcpy(priv->body, bodyp, bodylen);
@@ -246,6 +241,7 @@ mlfi_body(ctx, bodyp, bodylen)
 		priv->bodyLen += bodylen;
 	}
 
+	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
@@ -260,7 +256,7 @@ mlfi_eom(ctx)
 	parsed->memory = malloc(1);
 	parsed->size = 0;
 	char *mailaddr = smfi_getsymval(ctx, "{mail_addr}");
-	// Get the new body
+	// Nouveau corps du mail
 	if(sendBodyToParsing(priv->body, priv->bodyLen, parsed, mailaddr)==PARSING_OK){
 		if (smfi_replacebody(ctx, parsed->memory, parsed->size)==MI_FAILURE){
 			fprintf(stderr, "Replace body failed");
@@ -272,8 +268,6 @@ mlfi_eom(ctx)
 
 	free(parsed->memory);
 	free(parsed);
-
-	//TODO add header
 
 	return mlfi_cleanup(ctx, ok);
 }
@@ -299,7 +293,7 @@ mlfi_cleanup(ctx, ok)
 	if (priv == NULL)
 		return rstat;
 
-	/* close the archive file */
+	/* Fermeture du fichier de log */
 	if (priv->mlfi_fp != NULL && fclose(priv->mlfi_fp) == EOF)
 	{
 		/* failed; we have to wait until later */
@@ -310,7 +304,7 @@ mlfi_cleanup(ctx, ok)
 	}
 	else if (ok)
 	{
-		/* add a header to the message announcing our presence */
+		/* ajout d'un header pour annoncer notre presence */
 		if (gethostname(host, sizeof host) < 0)
 			snprintf(host, sizeof host, "localhost");
 		p = strrchr(priv->mlfi_fname, '/');
@@ -322,14 +316,14 @@ mlfi_cleanup(ctx, ok)
 	}
 	else
 	{
-		/* message was aborted -- delete the archive file */
+		/* message annulé -- suppression du fichier de log */
 		fprintf(stderr, "Message aborted.  Removing %s\n",
 			priv->mlfi_fname);
 		rstat = SMFIS_TEMPFAIL;
 		(void) unlink(priv->mlfi_fname);
 	}
 
-	/* release private memory */
+	/* Libération de la mémoire allouée */
 	if (priv->mlfi_fname != NULL)
 		free(priv->mlfi_fname);
 	/* return status */
@@ -388,23 +382,23 @@ mlfi_negotiate(ctx, f0, f1, f2, f3, pf0, pf1, pf2, pf3)
 
 struct smfiDesc smfilter =
 {
-	"AttachmentServerFilter",	/* filter name */
-	SMFI_VERSION,	/* version code -- do not change */
+	"AttachmentServerFilter",	/* nom du filtre */
+	SMFI_VERSION,	/* version code -- ne pas changer */
 	SMFIF_CHGBODY|SMFIF_ADDHDRS,
 			/* flags */
-	mlfi_connect,	/* connection info filter */
-	mlfi_helo,	/* SMTP HELO command filter */
-	mlfi_envfrom,	/* envelope sender filter */
-	mlfi_envrcpt,	/* envelope recipient filter */
-	mlfi_header,	/* header filter */
-	mlfi_eoh,	/* end of header */
-	mlfi_body,	/* body block filter */
-	mlfi_eom,	/* end of message */
-	mlfi_abort,	/* message aborted */
-	mlfi_close,	/* connection cleanup */
-	mlfi_unknown,	/* unknown SMTP commands */
+	mlfi_connect,	/* connextion au filtre */
+	mlfi_helo,	/* SMTP HELO commande filtre */
+	mlfi_envfrom,	/* envelope expéditeur filtre */
+	mlfi_envrcpt,	/* envelope destinataire filtre */
+	mlfi_header,	/* header filtre */
+	mlfi_eoh,	/* fin des headers */
+	mlfi_body,	/* corps du mail filtre */
+	mlfi_eom,	/* fin du message */
+	mlfi_abort,	/* message annulé */
+	mlfi_close,	/* connexion nettoyage */
+	mlfi_unknown,	/* SMTP commandes inconnues */
 	mlfi_data,	/* DATA command */
-	mlfi_negotiate	/* Once, at the start of each SMTP connection */
+	mlfi_negotiate	/* Une seule fois, au début de chaque connexion smtp */
 };
 
 static void
@@ -426,7 +420,7 @@ main(argc, argv)
 	const char *args = "p:t:h";
 	extern char *optarg;
 
-	/* Process command line options */
+	/* Processus command line options */
 
 	while ((c = getopt(argc, argv, args)) != -1)
 	{
@@ -448,9 +442,9 @@ main(argc, argv)
 			}
 
 			/*
-			**  If we're using a local socket, make sure it
-			**  doesn't already exist.  Don't ever run this
-			**  code as root!!
+			**  Si on utilise une socket local, vérifiez
+			**  qu'elle n'existe pas. Ne jamais lancer ce
+			**  code en tant que root !!
 			*/
 
 			if (strncasecmp(optarg, "unix:", 5) == 0)

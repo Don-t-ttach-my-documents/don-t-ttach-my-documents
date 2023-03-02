@@ -1,6 +1,6 @@
 #####
 #
-# File storage management, interfacing with Minio
+# File storage management, interface avec Minio
 #
 #####
 from datetime import datetime

@@ -21,7 +21,7 @@ static size_t receive_data(void *data, size_t size, size_t nmemb, void *userp)
 
   char *ptr = realloc(mem->memory, mem->size + realsize + 1);
   if(!ptr) {
-    /* out of memory! */
+    /* Pas assez de mémoire ! */
     printf("not enough memory (realloc returned NULL)\n");
     return 0;
   }
@@ -34,7 +34,6 @@ static size_t receive_data(void *data, size_t size, size_t nmemb, void *userp)
   return realsize;
 }
 
-//Envoie plusieurs requêtes en cas de pièce jointe trop lourdes
 static size_t send_data_callback(char *dest, size_t size, size_t nmemb, void *userp)
 {
   struct WriteThis *wt = (struct WriteThis *)userp;
@@ -42,7 +41,7 @@ static size_t send_data_callback(char *dest, size_t size, size_t nmemb, void *us
 
   if (wt->sizeleft)
   {
-    /* copy as much as possible from the source to the destination */
+    /* copie autant de données que possible de la source à la destination */
     size_t copy_this_much = wt->sizeleft;
     if (copy_this_much > buffer_size)
       copy_this_much = buffer_size;
@@ -50,14 +49,15 @@ static size_t send_data_callback(char *dest, size_t size, size_t nmemb, void *us
 
     wt->readptr += copy_this_much;
     wt->sizeleft -= copy_this_much;
-    return copy_this_much; /* we copied this many bytes */
+    return copy_this_much; /* on a copié tant */
   }
 
-  return 0; /* no more data left to deliver */
+  return 0; /* plus de données à délivrer */
 }
 
 int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed, char* sender)
 {
+  // Changer l'adresse vers le service de parsing
   static const char url[27] = "http://parsing:3201/upload";
 
   CURL *curl;
@@ -67,36 +67,35 @@ int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed, c
   wt.readptr = body;
   wt.sizeleft = lenBody;
 
-  /* get a curl handle */
+  /* curl handle */
   curl = curl_easy_init();
   if (curl)
   {
-    /* First set the URL that is about to receive our POST. */
+    /* Ajout de l'url */
     curl_easy_setopt(curl, CURLOPT_URL, url);
 
-    /* Now specify we want to POST data */
+    /* Requete http POST */
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
 
-    /* we want to use our own read function */
+    /* Ajout de notre fonction de lecture */
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, send_data_callback);
     
-    /* pointer to pass to our read/send function */
+    /* Pointeur à passer à notre fonction de lecture */
     curl_easy_setopt(curl, CURLOPT_READDATA, &wt);
 
-    /* Set the expected POST size. If you want to POST large amounts of data,
-       consider CURLOPT_POSTFIELDSIZE_LARGE */
+    /* Taille du corps de la requete POST */
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)wt.sizeleft);
 
-    /* send all data to this function  */
+    /* envoie des données  */
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, receive_data);
 
-    /* we pass our 'chunk' struct to the callback function */
+    /* récupération des données */
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)parsed);
 
-    /* get verbose debug output please */
+    /* 1 pour avoir un debug verbeux, 0L sinon */
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
-    /* add mail of the sender in headers */
+    /* ajout du mail de l'expéditaire dans les headers */
     struct curl_slist *header = NULL;
     char* initSender = malloc(strlen(sender)+ strlen("Sender: ") +2);
     strcpy(initSender, "Sender: ");
@@ -104,7 +103,7 @@ int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed, c
     
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
 
-    /* Perform the request, res will get the return code */
+    /* Envoie de la requete, res retourne le code d'erreur */
     res = curl_easy_perform(curl);
 
     /* Check for errors */
@@ -112,7 +111,7 @@ int sendBodyToParsing(char *body, size_t lenBody, struct MemoryStruct *parsed, c
       fprintf(stderr, "curl_easy_perform() failed: %s\n",
               curl_easy_strerror(res));
 
-    /* always cleanup */
+    /* Nettoyage */
     curl_easy_cleanup(curl);
     curl_slist_free_all(header);
     free(initSender);
