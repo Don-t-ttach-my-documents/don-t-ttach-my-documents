@@ -1,5 +1,7 @@
 ## Installation
 ### Lancer tous les services
+Configurer le nom de domaine dans le fichier `.env`, ainsi que les identifiants pour se connecter à MinIO. Puis, lancer les services:
+
 ```bash
 docker-compose up --build
 ```
