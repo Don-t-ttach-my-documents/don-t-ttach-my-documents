@@ -5,6 +5,9 @@ Configurer le nom de domaine dans le fichier `.env`, ainsi que les identifiants 
 ```bash
 docker-compose up --build
 ```
+
+Dans ce fichier, on utilise un nom de domaine `test.com`
+
 ### Postfix
 #### Installation de Postfix
 Installation avec docker:
@@ -16,7 +19,7 @@ Tester si c'est bien installé:
 ```bash
 docker exec -it postfix bash
 #Dans le docker
-echo "Body of my mail blah blah blah" | mail -s "subject" root@<your-domain>
+echo "Body of my mail blah blah blah" | mail -s "subject" root@test.com
 ```
 Verifier que le contenu du mail est bien dans ~/maildir/new
 
@@ -25,7 +28,7 @@ Verifier que le contenu du mail est bien dans ~/maildir/new
 Nouveau -> Compte courrier existant
 
 - _Nom complet: User1_
-- _Adresse électronique: user1@testimt.com_
+- _Adresse électronique: user1@test.com_
 - _Mot de passe: 1234_
 
 Cliquer sur `Configuration manuelle`
@@ -42,29 +45,11 @@ Dans `Server entrant`:
 Dans `Serveur sortant`:
 
 - _Nom d'hôte: localhost_
-- _Port: 25_
+- _Port: 587_
 - _Sécurité de la connexion: Aucun_
 - _Méthode d'authentification: Mot de passe normal_
 - _Nom d'utilisateur: user1_
 
-Faire de même avec user2@testimt.com
+Faire de même avec user2@test.com
 
-Tester d'envoyer un mail de user1@testimt.com à user2@testimt.com avec Thunderbird, notamment avec une pièce jointe.
-
-### Parsing et File storage (avec Minio)
-#### Avec docker
-```
-docker-compose build parsing
-docker-compose up parsing
-```
-
-#### Hors docker
-```
-python -m venv venv
-. /venv/Scripts/activate
-pip install -r parsing/requirements.txt
-pip install -r filestorageapi/requirements.txt
-```
-
-Puis lancer les scripts python à la main
-
+Tester d'envoyer un mail de user1@test.com à user2@test.com avec Thunderbird, notamment avec une pièce jointe.
