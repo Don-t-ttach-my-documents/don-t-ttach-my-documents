@@ -22,28 +22,28 @@ Verifier que le contenu du mail est bien dans ~/maildir/new
 
 Nouveau -> Compte courrier existant
 
-_Nom complet: User1
-Adresse électronique: user1@testimt.com
-Mot de passe: 1234_
+- _Nom complet: User1_
+- _Adresse électronique: user1@testimt.com_
+- _Mot de passe: 1234_
 
 Cliquer sur `Configuration manuelle`
 
 Dans `Server entrant`:
 
-_Protocole: POP3
-Nom d'hôte: localhost
-Port: 110
-Sécurité de la connexion: Aucun
-Méthode d'authenficiation: Mot de passe normal
-Nom d'utilisateur: user1_
+- _Protocole: POP3_
+- _Nom d'hôte: localhost_
+- _Port: 110_
+- _Sécurité de la connexion: Aucun_
+- _Méthode d'authenficiation: Mot de passe normal_
+- _Nom d'utilisateur: user1_
 
 Dans `Serveur sortant`:
 
-_Nom d'hôte: localhost
-Port: 25
-Sécurité de la connexion: Aucun
-Méthode d'authentification: Mot de passe normal
-Nom d'utilisateur: user1_
+- _Nom d'hôte: localhost_
+- _Port: 25_
+- _Sécurité de la connexion: Aucun_
+- _Méthode d'authentification: Mot de passe normal_
+- _Nom d'utilisateur: user1_
 
 Faire de même avec user2@testimt.com
 
